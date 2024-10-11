@@ -1,0 +1,1 @@
+## Service for obtaining meteorological data using a third-party service and library "Google Gson"
