@@ -1,53 +1,31 @@
 package org.mifi;
 
 import com.google.gson.Gson;
+import org.mifi.entyti.Forecasts;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.Scanner;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 
 public class Main {
     public static void main(String[] args) {
-        Secret secret = null;
+        final double LAT = 66.37125;
+        final double LON = 66.23388;
+        final int LIMIT = 7;  //Для тарифа «Тестовый» максимально допустимое значение — 7.
+        int summ = 0;
         Gson gson = new Gson();
-        String secretFileName = "secret.json";
-        try (FileReader reader = new FileReader(Main.class.getClassLoader().getResource(secretFileName).getFile())) {
-            secret = gson.fromJson(reader, Secret.class);
-        } catch (NullPointerException e) {
-            System.out.println(secretFileName + " не найден\nСойздайте файл resources/" + secretFileName + " c наполнением:\n{\n" +
-                    "  \"secret\": \"secret_key\"\n" +
-                    "}");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Weather weather = new Weather();
+        String responseBody = weather.getResponseBodyFromLatAndLonByLimit(LAT, LON, LIMIT);
+        System.out.println("Response Body: " + responseBody);
+        Response response = gson.fromJson(responseBody, Response.class);
+        System.out.println("Температура fact{temp}: " + response.getFact().getTemp() + "°C");
+        for (Forecasts forecasts : response.getForecasts()) summ += forecasts.getTempAvgDay();
+        String start = dateFormat(response.getForecasts().getFirst().getDate());
+        String stop = dateFormat(response.getForecasts().getLast().getDate());
+        System.out.println("Средняя температура c " + start + " по " + stop + " равна: " + (LIMIT == 0 ? summ : summ / LIMIT) + "°C");
+    }
 
-        //https://api.weather.yandex.ru/v2/forecast?lat=52.37125&lon=4.89388' -H 'X-Yandex-Weather-Key: your_key
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Введите Широту, Latitude, lat - идет с севера (North, N) на юг (South, S):");
-        double lat = scanner.nextDouble();
-        System.out.print("Введите Долготу, Longitude, lng - идет с запада (West, W) на восток (East, E):");
-        double lon = scanner.nextDouble();
-        HttpClient httpClient = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://api.weather.yandex.ru/v2/forecast?lat=" + lat + "&lon=" + lon))
-                .setHeader("X-Yandex-Weather-Key", secret.getSecret())
-                .GET()
-                .build();
-        try {
-            HttpResponse<String> responseBody = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println("Response Body: " + responseBody.body());    //Получены все данные от сервиса
-            Response response = gson.fromJson(responseBody.body(), Response.class);
-            int temperature = response.getFact().getTemp();
-            System.out.println("Температура fact{temp}: " + temperature);   //Отдельно вывод температуры
-
-        } catch (Exception e) {
-            System.err.println("Error making HTTP request: " + e.getMessage());
-        }
-
-
+    private static String dateFormat(Date date) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yy");
+        return simpleDateFormat.format(date);
     }
 }

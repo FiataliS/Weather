@@ -1,4 +1,4 @@
-package org.mifi;
+package org.mifi.entyti;
 
 public class Fact {
     private int temp;
