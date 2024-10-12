@@ -1,7 +1,7 @@
 package org.mifi;
 
 import com.google.gson.Gson;
-import org.mifi.entyti.Secret;
+import org.mifi.entity.Secret;
 
 import java.io.FileReader;
 import java.io.IOException;

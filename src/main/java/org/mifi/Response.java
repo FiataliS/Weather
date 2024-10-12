@@ -1,7 +1,7 @@
 package org.mifi;
 
-import org.mifi.entyti.Fact;
-import org.mifi.entyti.Forecasts;
+import org.mifi.entity.Fact;
+import org.mifi.entity.Forecasts;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package org.mifi.entyti;
+package org.mifi.entity;
 
 public class Fact {
     private int temp;

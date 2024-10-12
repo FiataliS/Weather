@@ -1,7 +1,7 @@
 package org.mifi;
 
 import com.google.gson.Gson;
-import org.mifi.entyti.Forecasts;
+import org.mifi.entity.Forecasts;
 
 import java.util.Date;
 import java.text.SimpleDateFormat;
